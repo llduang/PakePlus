@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具导航</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== 首页 ===== */
+        #homePage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            max-width: 780px;
+            width: 100%;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 28px 24px;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            border-color: #ccc;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #777;
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .card-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .card:hover .card-action { color: #222; }
+
+        .arrow {
+            font-size: 15px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover .arrow { transform: translateX(3px); }
+
+        /* ===== 工具页 ===== */
+        #toolPage {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            height: 48px;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fff;
+            color: #444;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .btn-back:hover {
+            background: #f5f5f5;
+        }
+
+        .toolbar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .toolbar-sep {
+            width: 1px;
+            height: 20px;
+            background: #e5e5e5;
+        }
+
+        .tool-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            background: #fff;
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: #333;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 13px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== 右键菜单 ===== */
+        .context-menu {
+            position: fixed;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 4px 0;
+            min-width: 170px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .context-menu-item {
+            padding: 9px 16px;
+            font-size: 13px;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.1s;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .context-menu-item .item-icon {
+            font-size: 14px;
+            width: 18px;
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            .cards-container { grid-template-columns: 1fr; }
+            .header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 首页 -->
+    <div id="homePage">
+        <div class="header">
+            <h1>工具导航</h1>
+            <p>选择需要的工具</p>
+        </div>
+        <div class="cards-container" id="cardsContainer"></div>
+    </div>
+
+    <!-- 工具页 -->
+    <div id="toolPage">
+        <div class="toolbar">
+            <button class="btn-back" id="btnBack">
+                <span>&larr;</span> 返回
+            </button>
+            <div class="toolbar-sep"></div>
+            <span class="toolbar-title" id="toolbarTitle"></span>
+        </div>
+        <iframe class="tool-frame" id="toolFrame" allow="clipboard-read; clipboard-write"></iframe>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="context-menu" id="contextMenu"></div>
+
+    <script>
+        const tools = [
+            {
+                id: 'formula',
+                title: '公式识别',
+                desc: '上传图片识别数学公式，支持 LaTeX 格式输出。',
+                url: 'https://u1sse2wxwkj0-d.space.z.ai/',
+                icon: '&#x1F9EE;',
+            },
+            {
+                id: 'formula-text',
+                title: '公式及文本识别',
+                desc: '识别公式与文本，结果可直接复制到 Typora 或 Word。',
+                url: 'https://c190h3r94v21-d.space.z.ai/',
+                icon: '&#x1F4DD;',
+            },
+        ];
+
+        const homePage = document.getElementById('homePage');
+        const toolPage = document.getElementById('toolPage');
+        const toolFrame = document.getElementById('toolFrame');
+        const toolbarTitle = document.getElementById('toolbarTitle');
+        const btnBack = document.getElementById('btnBack');
+
+        let currentTool = null;
+
+        function openTool(tool) {
+            currentTool = tool;
+            toolbarTitle.textContent = tool.title;
+            toolFrame.src = tool.url;
+            homePage.style.display = 'none';
+            toolPage.style.display = 'flex';
+        }
+
+        function closeTool() {
+            currentTool = null;
+            toolFrame.src = '';
+            toolPage.style.display = 'none';
+            homePage.style.display = 'flex';
+        }
+
+        btnBack.addEventListener('click', closeTool);
+
+        // 构建卡片
+        const container = document.getElementById('cardsContainer');
+
+        tools.forEach(tool => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.url = tool.url;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-icon">${tool.icon}</div>
+                    <div class="card-title">${tool.title}</div>
+                </div>
+                <div class="card-desc">${tool.desc}</div>
+                <div class="card-footer">
+                    <span class="card-action">打开 <span class="arrow">&rarr;</span></span>
+                </div>
+            `;
+
+            card.addEventListener('click', () => openTool(tool));
+
+            card.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                showContextMenu(e.clientX, e.clientY, tool);
+            });
+
+            container.appendChild(card);
+        });
+
+        // 右键菜单
+        const contextMenu = document.getElementById('contextMenu');
+
+        function showContextMenu(x, y, tool) {
+            contextMenu.innerHTML = `
+                <div class="context-menu-item" data-action="embed">
+                    <span class="item-icon">&#x25B6;</span> 在此打开
+                </div>
+                <div class="context-menu-item" data-action="open">
+                    <span class="item-icon">&#x1F517;</span> 新标签页打开
+                </div>
+                <div class="context-menu-item" data-action="copy">
+                    <span class="item-icon">&#x1F4CB;</span> 复制链接
+                </div>
+            `;
+
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.style.display = 'block';
+
+            const rect = contextMenu.getBoundingClientRect();
+            if (rect.right > window.innerWidth) contextMenu.style.left = (x - rect.width) + 'px';
+            if (rect.bottom > window.innerHeight) contextMenu.style.top = (y - rect.height) + 'px';
+
+            contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const a = item.dataset.action;
+                    if (a === 'embed') openTool(tool);
+                    else if (a === 'open') window.open(tool.url, '_blank', 'noopener,noreferrer');
+                    else if (a === 'copy') {
+                        navigator.clipboard.writeText(tool.url).then(() => showToast('链接已复制')).catch(() => {
+                            const ta = document.createElement('textarea');
+                            ta.value = tool.url;
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(ta);
+                            showToast('链接已复制');
+                        });
+                    }
+                    contextMenu.style.display = 'none';
+                });
+            });
+        }
+
+        document.addEventListener('click', () => contextMenu.style.display = 'none');
+
+        // Toast
+        const toast = document.getElementById('toast');
+        let toastTimer;
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+        }
+    </script>
+</body>
+</html>
